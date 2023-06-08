@@ -1,0 +1,75 @@
+version: "3.7"
+
+services:
+
+################################################################################
+  # NGINX PROXY
+  ################################################################################
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: unless-stopped
+    container_name: nginx-proxy
+    links:
+      - auth-service-web
+      - auth-service-api
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - ./nginx/acn_headers.conf:/etc/nginx/conf.d/acn_headers.conf
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    ports:
+      - "80:80"
+      - "443:443"
+
+  ################################################################################
+  # REDIS
+  ################################################################################
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+
+  ################################################################################
+  # AUTH SERVICE
+  ################################################################################
+  auth-service-api:
+    image: myapp
+    volumes:
+      - ./data/auth_service/:/data
+      - ./certs:/etc/nginx/certs
+      - ./shared:/home/vault
+    links:
+      - redis
+    env_file:
+      - ./api-env
+    restart: unless-stopped
+
+  auth-service-web:
+    image: myapp
+    volumes:
+      - ./data/auth_service/:/data
+      - ./shared:/home/vault
+    env_file:
+      - ./web-env
+    restart: unless-stopped
+    environment:
+      - AUTH_WEB_REDIS_HOST=redis
+
+  ################################################################################
+  # VAULT AGENT
+  ################################################################################
+
+  vault-agent:
+    image: vault
+    container_name: vault-agent
+    privileged: true
+    environment:
+      VAULT_ADDR: "https://vault.com"
+    volumes:
+      - ./vault-config:/etc/vault.d
+      - ./:/home/vault
+    command: "sh etc/vault.d/init.sh"
+
