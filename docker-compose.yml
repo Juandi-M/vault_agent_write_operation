@@ -14,7 +14,7 @@ services:
       - auth-service-api
     volumes:
       - ./certs:/etc/nginx/certs
-      - ./nginx/acn_headers.conf:/etc/nginx/conf.d/acn_headers.conf
+      - ./nginx/nginx_headers.conf:/etc/nginx/conf.d/nginx_headers.conf
       - ./nginx/vhost.d:/etc/nginx/vhost.d
       - /var/run/docker.sock:/tmp/docker.sock:ro
     ports:
