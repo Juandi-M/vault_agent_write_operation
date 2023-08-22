@@ -1,11 +1,11 @@
-# Use a Node.js base image
-FROM node:20.5.1
+# Use a specific Node.js base image
+FROM node:20.5.1-alpine
 
 # Set the working directory in the container
 WORKDIR /app
 
 # Create a new user 'appuser'
-RUN useradd -m appuser
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 
 # Copy package.json and package-lock.json to the container from WebRender
 COPY WebRender/package*.json ./
@@ -13,7 +13,7 @@ COPY WebRender/package*.json ./
 # Install application dependencies
 RUN npm install
 
-# Copy the rest of the application files from WebRender
+# Copy the rest of the application files from WebRender, including appconfigs.json
 COPY WebRender/ .
 
 # Change ownership of the /app directory to appuser

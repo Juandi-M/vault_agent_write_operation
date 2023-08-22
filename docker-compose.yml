@@ -30,5 +30,3 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: web-app-render
-    volumes:
-      - ./WebRender/appconfigs.json:/app/appconfigs.json
