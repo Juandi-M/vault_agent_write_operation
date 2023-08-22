@@ -1,46 +1,50 @@
 pid_file = "/vault-agent.pidfile"
 
-vault {
-  address = "http://vaultaddress:8200"
-}
 exit_after_auth = true
 
 auto_auth {
+
   method {
-    type = "approle"
+    # Activate the token_file method
+    type = "token_file"
     config = {
-      role_id_file_path = "/etc/vault.d/auth-staging-role-id"
-      secret_id_file_path = "/etc/vault.d/auth-staging-secret-id"
-      remove_secret_id_file_after_reading = false
+      token_file_path = "/etc/vault.d/.vault-token"
     }
+
+    // method {
+    //   # Fallback method: approle
+    //   type = "approle"
+    //   config = {
+    //     role_id_file_path   = "/path/to/role-id"
+    //     secret_id_file_path = "/path/to/secret-id"
+    //     remove_after_reading = {
+    //       role_id   = true
+    //       secret_id = true
+    //     }
+    //   }
+    // }
   }
 
-  sink  {
+  sink {
     type = "file"
     config = {
-      path = "/etc/vault.d/token"
+      path             = "/etc/vault.d/.vault-token"
+      remove_after_use = true
     }
   }
 }
 
-cache{
- use_auto_auth_token = false
+api_proxy {
+  use_auto_auth_token = true
 }
 
-#api-env
+# Templating files & paths
+
 template {
-  source      = "/etc/vault.d/api-env.ctmpl"
-  destination = "/home/vault/api-env"
+  source               = "/etc/vault.d/appconfigs.ctmpl"
+  destination          = "/home/vault/appconfigs.json"
   error_on_missing_key = true
 }
-
-#web-env
-# Second template example. There's no env files for AUTH web
-#template {
-#  source      = "/etc/vault.d/web-env.ctmpl"
-#  destination = "/home/vault/web-env"
-#  error_on_missing_key = true
-#}
 
 listener "tcp" {
   address     = "127.0.0.1:8100"

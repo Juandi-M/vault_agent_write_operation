@@ -1,0 +1,13 @@
+YourProjectRootDirectory/
+|-- node_modules/
+|-- WebRender/
+|   |-- Routes/
+|   |   |-- index.js
+|   |-- utils/
+|   |   |-- configLoader.js
+|   |   |-- htmlRenderer.js
+|   |-- WebTemplates/
+|   |   |-- template.html
+|-- app.js
+|-- package.json
+|-- appconfigs.json
