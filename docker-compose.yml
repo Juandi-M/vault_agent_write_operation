@@ -11,9 +11,7 @@ services:
       - ./nginx/nginx_headers.conf:/etc/nginx/nginx_headers.conf
     ports:
       - "80:80"
-    networks:
-      - app-network
-
+      
   # VAULT AGENT
   vault-agent:
     image: hashicorp/vault
@@ -25,8 +23,6 @@ services:
       - ./vault-config:/etc/vault.d
       - ./WebRender/:/home/vault/
     command: ["sh", "-c", "vault agent -config=/etc/vault.d/vault-agent.hcl"]
-    networks:
-      - app-network
 
   # WEB APP RENDER
   web-app:
@@ -34,12 +30,5 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: web-app-render
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
-
-volumes:
-  node_modules:
+    volumes:
+      - ./WebRender/appconfigs.json:/app/appconfigs.json

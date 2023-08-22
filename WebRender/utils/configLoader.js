@@ -13,10 +13,14 @@ async function loadConfig() {
         const data = await fs.readFile("appconfigs.json", "utf8");
         appConfig = JSON.parse(data);
         usingDefaultConfig = false;
+        console.log("Configuration loaded successfully.");
     } catch (err) {
+        console.error("Error loading appconfigs.json:", err);
         usingDefaultConfig = true;
     }
 }
+
+
 
 // Initialize by loading config and setting up watcher
 loadConfig();
