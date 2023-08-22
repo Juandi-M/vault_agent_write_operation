@@ -1,18 +1,21 @@
-pid_file = "/vault-agent.pidfile"
+# PID file for the Vault Agent process
+pid_file = "/tmp/vault-agent.pid"
 
-exit_after_auth = true
+# Exit container after sink auth.
+exit_after_auth = false
 
+# Auto-auth config to automatically authenticate and renew a token
 auto_auth {
-
-  method {
-    # Activate the token_file method
-    type = "token_file"
-    config = {
+  # Use the token_file method to read a token from a file. Time to wait between retries if auth fails
+  method "token_file" {
+    min_backoff = "60s" 
+    max_backoff = "120s"
+    config {
       token_file_path = "/etc/vault.d/.vault-token"
     }
-
+  }
+  # Fallback method: approle
     // method {
-    //   # Fallback method: approle
     //   type = "approle"
     //   config = {
     //     role_id_file_path   = "/path/to/role-id"
@@ -23,30 +26,41 @@ auto_auth {
     //     }
     //   }
     // }
-  }
 
-  sink {
-    type = "file"
-    config = {
-      path             = "/etc/vault.d/.vault-token"
-      remove_after_use = true
+  # Write the token to the same file sink
+  sink "file" {
+    config {
+      path = "/etc/vault.d/.vault-token" 
     }
   }
 }
 
-api_proxy {
-  use_auto_auth_token = true
-}
-
-# Templating files & paths
-
-template {
-  source               = "/etc/vault.d/appconfigs.ctmpl"
-  destination          = "/home/vault/appconfigs.json"
-  error_on_missing_key = true
-}
-
+# Listener to accept new tokens over TCP
 listener "tcp" {
-  address     = "127.0.0.1:8100"
+  address = "127.0.0.1:8200"
   tls_disable = true
+
+  # Allow token auth on the /vault/login path
+  auth_method "token" {
+    path = "/vault/login"
+  }
+}
+
+template_config {
+  // Determines the behavior when template rendering retries fail.
+  // If set to true, Vault Agent will exit if it cannot successfully render a template after all retry attempts.
+  exit_on_retry_failure = true
+  
+  // Specifies the frequency at which static secrets (secrets without a lease) are re-rendered in templates.
+  // In this case, static secrets are re-rendered every 1 minute.
+  static_secret_render_interval = "1m"
+}
+
+# Template config to render templates
+template {
+  source      = "/etc/vault.d/appconfigs.ctmpl" 
+  destination = "/home/vault/appconfigs.json"
+
+  # Fail if keys are missing
+  error_on_missing_key = true
 }
