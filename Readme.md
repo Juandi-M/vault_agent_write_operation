@@ -15,36 +15,36 @@ This project illustrates the capabilities of Vault Agent Templating and Secret I
 
 ## Project Structure
 ```ascii
-vaultAgent-docker/
-├── nginx/
-│   ├── nginx_headers.conf
-│   ├── web-app-proxy.conf
-│   └── vhost.d/
-│       └── default_location
-├── Vault-config/
-│   ├── appconfigs.ctmpl
-│   ├── role-id
-│   ├── secret-id
-│   └── vault-agent.hcl
-├── WebRender/
-│   ├── routes/
-│   │   └── routes.js
-│   ├── utils/
-│   │   ├── configLoader.js
-│   │   └── htmlRenderer.js
-│   ├── webTemplates/
-│   |   └── template.html
-│   ├── App.js
-│   ├── appconfigs.js
-│   ├── package.json
-├── .dockerignore
-├── docker-compose.yml
+.
 ├── Dockerfile
-└── README.md
+├── Readme.md
+├── docker-compose.yml
+├── nginx
+│   ├── nginx_headers.conf
+│   ├── vhost.d
+│   │   └── default_location
+│   └── web-app-proxy.conf
+├── structuremap.ascii
+├── vault-config
+│   ├── appconfigs.ctmpl
+│   └── vault-agent.hcl
+└── web
+    ├── configs
+    │   └── appconfigs.json
+    └── js
+        ├── app.js
+        ├── package.json
+        ├── routes
+        │   └── index.js
+        ├── utils
+        │   ├── configLoader.js
+        │   └── htmlRenderer.js
+        └── webTemplates
+            └── template.html
 ```
 
 
-## Application Structure and Data Flow
+## Application Overview
 
 The application is architected to ensure dynamic updates of configuration without overwriting files or volumes, and without the need to bring down the web app container.
 
@@ -89,8 +89,6 @@ Visit the website at http://localhost.
 Accessing Application Logs
 To access logs from the web-app-render container:
 
-CODE:
-
 ```bash
 Copy code
 docker logs -f web-app-render
@@ -102,8 +100,6 @@ Ensure files and directories are correctly positioned.
 Docker must be able to access and mount necessary directories/files.
 
 Validate the accuracy of application configurations (appconfigs.json).
-
-CODE:
 
 ```bash
 Copy code
