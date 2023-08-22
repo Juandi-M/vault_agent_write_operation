@@ -1,0 +1,15 @@
+{
+  "name": "webrender",
+  "version": "1.0.0",
+  "description": "Web Render Service",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.2",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security"
+  }
+}

@@ -21,7 +21,7 @@ services:
       VAULT_ADDR: "https://hcvault-sandbox.llm-aws.com:8200/"
     volumes:
       - ./vault-config:/etc/vault.d
-      - ./WebRender/:/home/vault/
+      - ./web/configs/:/home/vault/
     command: ["sh", "-c", "vault agent -config=/etc/vault.d/vault-agent.hcl"]
 
   # WEB APP RENDER
@@ -30,3 +30,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: web-app-render
+    volumes:
+      - ./web/configs/:/app/configs
+    environment:
+      NODE_PATH: /jsproject/node_modules

@@ -1,8 +1,10 @@
 const fs = require('fs').promises;
 const chokidar = require('chokidar');
 
+const CONFIG_PATH = '/app/configs/appconfigs.json';
+
 let appConfig = {
-    value1: "default_value1",
+    value1: "the_vaules_from_vault_do_not_work",
     // ... other defaults
 };
 
@@ -10,7 +12,7 @@ let usingDefaultConfig = false;
 
 async function loadConfig() {
     try {
-        const data = await fs.readFile("appconfigs.json", "utf8");
+        const data = await fs.readFile(CONFIG_PATH, "utf8");
         appConfig = JSON.parse(data);
         usingDefaultConfig = false;
         console.log("Configuration loaded successfully.");
@@ -20,11 +22,9 @@ async function loadConfig() {
     }
 }
 
-
-
 // Initialize by loading config and setting up watcher
 loadConfig();
-chokidar.watch('appconfigs.json').on('change', loadConfig);
+chokidar.watch(CONFIG_PATH).on('change', loadConfig);
 
 function getConfig() {
     return {
