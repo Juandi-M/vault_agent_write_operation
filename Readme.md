@@ -43,9 +43,28 @@ vaultAgent-docker/
 └── README.md
 ```
 
-## Application Overview
 
-The Express website dynamically serves content, referencing the `WebTemplates` folder. Sensitivities such as database credentials or API keys required by the website are retrieved from HashiCorp Vault. Vault Agent manages the templating and secret injection, ensuring a secure, reduced-risk data handling process.
+## Application Structure and Data Flow
+
+The application is architected to ensure dynamic updates of configuration without overwriting files or volumes, and without the need to bring down the web app container.
+
+### 1. Separation of Concerns
+- **Application Code**: Resides in the `web/js/` directory.
+- **Configuration Files**: Including `appconfigs.json`, are stored in the `web/configs/` directory.
+
+### 2. Dockerized Environment
+- **Dockerfile**: Defines the setup for the web application. It ensures all necessary files and dependencies are inside the container, and the application runs under a non-root user for added security.
+- **docker-compose.yml**: Orchestrates the services, including the web application, NGINX proxy, and Vault agent.
+
+### 3. Dynamic Configuration with Vault
+- **Vault Agent**: Configured to write secrets to the `appconfigs.json` file. This file is stored in a directory that's shared between the host and the Vault agent container.
+- **Web Application**: Also has access to this shared directory. This setup ensures that when the Vault agent updates the `appconfigs.json`, the web application can immediately read the updated configuration without a restart.
+
+### 4. No Overwrites
+- By separating the application code and configuration into different directories and ensuring proper volume mounts in `docker-compose.yml`, we prevent any accidental overwrites. This separation ensures that the Vault agent can recreate the `appconfigs.json` as needed, and the web application can display changes in real-time.
+
+### 5. Dynamic Updates without Downtime
+- Thanks to the shared volume for `appconfigs.json`, any changes made by the Vault agent are immediately available to the web application. This dynamic update mechanism means there's no need to bring down the web app container or restart it to reflect configuration changes.
 
 ## Prerequisites
 
